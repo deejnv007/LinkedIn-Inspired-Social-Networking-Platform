@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: ${USER_SERVICE_URI:lb://USER-SERVICE}
+              predicates:
+                - Path=/api/v1/user/**
+              filters:
+                - StripPrefix=2
+
+            - id: post-service
+              uri: ${POST_SERVICE_URI:lb://POST-SERVICE}
+              predicates:
+                - Path=/api/v1/post/**
+              filters:
+                - StripPrefix=2
+                - name: AuthenticationFilter
+
+            - id: connection-service
+              uri: ${CONNECTION_SERVICE_URI:lb://CONNECTION-SERVICE}
+              predicates:
+                - Path=/api/v1/connection/**
+              filters:
+                - StripPrefix=2
+                - name: AuthenticationFilter
+
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URI:lb://NOTIFICATION-SERVICE}
+              predicates:
+                - Path=/api/v1/notification/**
+              filters:
+                - StripPrefix=2
+                - name: AuthenticationFilter
+
+server:
+  port: 8080
+
+jwt:
+  secretKey: ndwdfw67d5w87#e1e@jshdhja7sfywebfjyert3t
+
+eureka:
+#  instance:
+#    prefer-ip-address: true
+#    ip-address: 127.0.0.1
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
